@@ -1,23 +1,38 @@
 {
-  "name": "server_ec",
-  "version": "1.0.0",
-  "main": "index.js",
-  "type": "module",
-  "scripts": {
-    "start": "nodemon --inspect src/index.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "",
-  "license": "ISC",
-  "description": "",
-  "dependencies": {
-    "cors": "^2.8.5",
-    "dotenv": "^16.4.7",
-    "express": "^4.21.2",
-    "mongodb": "^6.13.0"
-  },
-  "devDependencies": {
-    "morgan": "^1.10.0",
-    "nodemon": "^3.1.9"
-  }
+    "name": "server_ec",
+    "version": "1.0.0",
+    "main": "index.js",
+    "type": "module",
+    "scripts": {
+        "start": "nodemon --inspect src/index.js",
+        "test": "echo \"Error: no test specified\" && exit 1",
+        "prepare": "husky install"
+    },
+    "lint-staged": {
+        "*.{js, jsx,ts,tsx}": [
+            "eslint --quiet --fix"
+        ],
+        "*.{json,js,ts,jsx,tsx,html}": [
+            "prettier --write --ignore-unknown"
+        ]
+    },
+    "author": "",
+    "license": "ISC",
+    "description": "",
+    "dependencies": {
+        "cors": "^2.8.5",
+        "dotenv": "^16.4.7",
+        "express": "^4.21.2",
+        "mongodb": "^6.13.0"
+    },
+    "devDependencies": {
+        "eslint": "^9.20.1",
+        "eslint-config-prettier": "^10.0.1",
+        "globals": "^15.15.0",
+        "husky": "^8.0.3",
+        "lint-staged": "^15.4.3",
+        "morgan": "^1.10.0",
+        "nodemon": "^3.1.9",
+        "prettier": "^3.5.1"
+    }
 }

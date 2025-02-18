@@ -1,7 +1,7 @@
-import homeRouter from "./home.js";
+import homeRouter from './home.js';
 
 function route(app) {
-  app.use("/", homeRouter);
+    app.use('/', homeRouter);
 }
 
 export default route;

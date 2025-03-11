@@ -1,17 +1,25 @@
+// src/connections/db.js
 import { MongoClient } from 'mongodb';
+
 const URI = process.env.MONGO_URI;
 const client = new MongoClient(URI);
 
 async function connect() {
-    // Use connect method to connect to the server
-    await client.connect();
-    console.log('Connected successfully to server');
-    return 'done.';
+    try {
+        await client.connect();
+        console.log('Connected successfully to MongoDB server');
+        return client; // Return the connected client
+    } catch (error) {
+        console.error('Error connecting to MongoDB:', error);
+        throw error;
+    }
 }
 
-connect()
-    .then(console.log)
-    .catch(console.error)
-    .finally(() => client.close());
-
-export default connect;
+// Export a function to get the client, ensuring it's connected
+let dbClient = null;
+export default async function getClient() {
+    if (!dbClient) {
+        dbClient = await connect();
+    }
+    return dbClient;
+}

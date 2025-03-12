@@ -67,6 +67,33 @@ class ProductModel {
         }
     }
 
+    // get product by best selling
+    async getBestSellerProduct(limit = 10, skip = 0, select = null, filter = {}) {
+        await this.ensureInitialized(); // Replace multiple initialize calls
+        try {
+            // Create projection object from select string if provided
+            let projection = {};
+            if (select) {
+                const fields = select.split(',');
+                fields.forEach((field) => {
+                    projection[field.trim()] = 1;
+                });
+            }
+
+            // Use proper MongoDB query structure
+            return await this.collection
+                .find(filter) // First parameter is the filter
+                .project(projection) // Use project() method for projection
+                .skip(skip)
+                .limit(limit)
+                .sort({ sales: -1 })
+                .toArray();
+        } catch (err) {
+            console.error(`Error in getBestSellerProduct model with params: limit=${limit}, skip=${skip}, select=${select}:`, err);
+            throw err;
+        }
+    }
+
     // Update other methods similarly
     async create(data) {
         await this.ensureInitialized();

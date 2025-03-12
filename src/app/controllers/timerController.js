@@ -1,7 +1,83 @@
 // controllers/itemController.js
-import ProductModel from '../model/product.js';
+import TimerModel from '../model/timer.js';
 
-const itemModel = new ProductModel(); // Instantiate the model
+const itemModel = new TimerModel(); // Instantiate the model
+
+export const getTimerByName = async (req, res) => {
+    try {
+        const itemName = req.params.name; // Get item ID from request parameters
+        const item = await itemModel.getTimelines(itemName);
+
+        const timelineData = item.map((timeline) => ({
+            id: timeline._id,
+            title: timeline.title,
+            startTime: timeline.startTime, // ISO date string
+            endTime: timeline.endTime, // ISO date string
+            status: timeline.status,
+            createdAt: timeline.createdAt,
+        }));
+        if (!item) {
+            // If item not found, return 404 Not Found
+            return res.status(404).json({
+                success: false,
+                message: 'Item not found',
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Item retrieved successfully',
+            data: timelineData,
+        });
+    } catch (error) {
+        console.error('Error in getTimerByName controller:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve item',
+            error: error.message || 'Internal Server Error',
+        });
+    }
+};
+
+export const createTimeline = async (req, res) => {
+    try {
+        const timelineData = {
+            userId: req.body.userId,
+            title: req.body.title,
+            startTime: new Date(req.body.startTime),
+            endTime: new Date(req.body.endTime),
+        }; // Get item ID from request parameters
+        const newTimeline = await itemModel.createTimeline(timelineData);
+
+        if (!newTimeline) {
+            // If item not found, return 404 Not Found
+            return res.status(404).json({
+                success: false,
+                message: 'Item not found',
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: {
+                id: newTimeline._id,
+                title: newTimeline.title,
+                startTime: newTimeline.startTime,
+                endTime: newTimeline.endTime,
+                status: newTimeline.status,
+                createdAt: newTimeline.createdAt,
+            },
+            message: 'Item retrieved successfully',
+        });
+    } catch (error) {
+        console.error('Error in getTimerByName controller:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve item',
+            error: error.message || 'Internal Server Error',
+        });
+    }
+};
 
 // Controller function for creating a new item
 export const createItem = async (req, res) => {
@@ -27,76 +103,6 @@ export const createItem = async (req, res) => {
             success: false,
             message: 'Failed to create item',
             error: error.message || 'Internal Server Error', // Provide error message from error object if available
-        });
-    }
-};
-
-//controller function for getting item and pagination
-export const getProducts = async (req, res) => {
-    try {
-        const limit = parseInt(req.query.limit) || 10;
-        const skip = parseInt(req.query.skip) || 0;
-        const select = req.query.select;
-
-        const items = await itemModel.getProducts(limit, skip, select);
-        res.status(200).json({
-            success: true,
-            message: 'Items retrieved successfully',
-            data: items,
-        });
-    } catch (error) {
-        console.error('Error in getProducts controller:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to retrieve items',
-            error: error.message || 'Internal Server Error',
-        });
-    }
-};
-
-//controller for getting product by subcategory
-export const getProductsBySubCategory = async (req, res) => {
-    try {
-        const limit = parseInt(req.query.limit) || 10;
-        const skip = parseInt(req.query.skip) || 0;
-        const select = req.query.select;
-        const categoryName = req.params.categoryName;
-
-        const items = await itemModel.getProductsBySubCategory(limit, skip, select, categoryName);
-        res.status(200).json({
-            success: true,
-            message: 'getProductsBySubCategory retrieved successfully',
-            data: items,
-        });
-    } catch (error) {
-        console.error('Error in getProducts controller:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to retrieve items',
-            error: error.message || 'Internal Server Error',
-        });
-    }
-};
-
-//controller for getting product by best selling
-export const getBestSellerProduct = async (req, res) => {
-    try {
-        const limit = parseInt(req.query.limit) || 10;
-        const skip = parseInt(req.query.skip) || 0;
-        const select = req.query.select;
-
-        const items = await itemModel.getBestSellerProduct(limit, skip, select);
-        res.status(200).json({
-            success: true,
-            message: 'getBestSellerProduct retrieved successfully',
-            data: items,
-        });
-    } catch (error) {
-        console.error('Error in getBestSellerProduct controller:', error);
-        res.status(500).json({
-            success: false,
-            message: 'Failed to retrieve items',
-            error: error.message || 'Internal Server Error',
         });
     }
 };

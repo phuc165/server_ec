@@ -1,8 +1,11 @@
-// src/connections/db.js
+// src/connections/db.js - Fixed version
 import { MongoClient } from 'mongodb';
 
 const URI = process.env.MONGO_URI;
 const client = new MongoClient(URI);
+
+// Use a promise to ensure we only connect once
+let connectionPromise = null;
 
 async function connect() {
     try {
@@ -16,10 +19,11 @@ async function connect() {
 }
 
 // Export a function to get the client, ensuring it's connected
-let dbClient = null;
 export default async function getClient() {
-    if (!dbClient) {
-        dbClient = await connect();
+    // If we don't have a connection promise yet, create one
+    if (!connectionPromise) {
+        connectionPromise = connect();
     }
-    return dbClient;
+    // Return the result of the connection promise
+    return connectionPromise;
 }

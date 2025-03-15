@@ -1,5 +1,5 @@
 // controllers/itemController.js
-import TimerModel from '../model/timer.js';
+import TimerModel from '../model/timerModel.js';
 
 const itemModel = new TimerModel(); // Instantiate the model
 

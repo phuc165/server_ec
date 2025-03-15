@@ -1,5 +1,5 @@
 // controllers/itemController.js
-import CategoryModel from '../model/category.js';
+import CategoryModel from '../model/categoryModel.js';
 
 const itemModel = new CategoryModel(); // Instantiate the model
 

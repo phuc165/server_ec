@@ -1,27 +1,12 @@
-// src/app/model/category.js
-import { ObjectId } from 'mongodb';
-import getClient from '../../connections/db.js';
+import BaseModel from './baseModel.js';
 
-class CategoryModel {
+class CategoryModel extends BaseModel {
     constructor() {
-        this.dbName = process.env.MONGO_DB_NAME || 'your_default_db_name';
-        this.collectionName = 'category';
-        this.initialize(); // Call async initialization
-    }
-
-    async initialize() {
-        try {
-            const client = await getClient(); // Get the connected client
-            this.db = client.db(this.dbName);
-            this.collection = this.db.collection(this.collectionName);
-        } catch (error) {
-            console.error('Error initializing CategoryModel:', error);
-            throw error;
-        }
+        super('category'); // Pass the collection name to the parent constructor
     }
 
     async create(data) {
-        await this.initialize(); // Ensure initialized
+        await this.ensureInitialized(); // Ensure ensureInitializedd
         try {
             const result = await this.collection.insertOne(data);
             return result;
@@ -32,7 +17,7 @@ class CategoryModel {
     }
 
     async getAll() {
-        await this.initialize();
+        await this.ensureInitialized();
         try {
             const items = await this.collection.find({}).toArray();
             return items;
@@ -43,7 +28,7 @@ class CategoryModel {
     }
 
     async getById(id) {
-        await this.initialize();
+        await this.ensureInitialized();
         try {
             const item = await this.collection.findOne({ _id: new ObjectId(id) });
             return item;
@@ -54,7 +39,7 @@ class CategoryModel {
     }
 
     async update(id, data) {
-        await this.initialize();
+        await this.ensureInitialized();
         try {
             const result = await this.collection.updateOne({ _id: new ObjectId(id) }, { $set: data });
             return result;
@@ -65,7 +50,7 @@ class CategoryModel {
     }
 
     async delete(id) {
-        await this.initialize();
+        await this.ensureInitialized();
         try {
             const result = await this.collection.deleteOne({ _id: new ObjectId(id) });
             return result;

@@ -1,54 +1,50 @@
-// src/app/model/category.js
 import { ObjectId } from 'mongodb';
 import getClient from '../../connections/db.js';
 
-class TimerModel {
-    constructor() {
+class BaseModel {
+    constructor(collectionName) {
         this.dbName = process.env.MONGO_DB_NAME || 'your_default_db_name';
-        this.collectionName = 'category';
-        this.initialize(); // Call async initialization
+        this.collectionName = collectionName;
+        this.collection = null;
+        this.initPromise = this._initialize();
     }
 
-    async initialize() {
+    async _initialize() {
         try {
             const client = await getClient(); // Get the connected client
             this.db = client.db(this.dbName);
             this.collection = this.db.collection(this.collectionName);
+            console.log(`${this.constructor.name} initialized with collection: ${this.collectionName}`);
+            return this.collection;
         } catch (error) {
-            console.error('Error initializing TimerModel:', error);
+            console.error(`Error initializing ${this.constructor.name}:`, error);
             throw error;
         }
     }
 
-    async getTimelines(timerName) {
-        try {
-            await this.initialize();
-            const timelines = await this.db.collection('timelines').find({ timerName }).sort({ createdAt: -1 }).toArray();
-            return timelines;
-        } catch (error) {
-            console.error('Error fetching timelines:', error);
-            throw error;
+    async ensureInitialized() {
+        if (!this.collection) {
+            await this.initPromise;
+        }
+        if (!this.collection) {
+            throw new Error(`Failed to initialize collection: ${this.collectionName}`);
         }
     }
 
-    async createTimeline(timelineData) {
+    // Common CRUD operations that all models will inherit
+    async create(data) {
+        await this.ensureInitialized();
         try {
-            await this.initialize();
-            const timeline = {
-                ...timelineData,
-                createdAt: new Date(),
-                status: 'active',
-            };
-            const result = await this.db.collection('timelines').insertOne(timeline);
-            return { ...timeline, _id: result.insertedId };
+            const result = await this.collection.insertOne(data);
+            return result;
         } catch (error) {
-            console.error('Error creating timeline:', error);
+            console.error('Error creating item:', error);
             throw error;
         }
     }
 
     async getAll() {
-        await this.initialize();
+        await this.ensureInitialized();
         try {
             const items = await this.collection.find({}).toArray();
             return items;
@@ -59,7 +55,7 @@ class TimerModel {
     }
 
     async getById(id) {
-        await this.initialize();
+        await this.ensureInitialized();
         try {
             const item = await this.collection.findOne({ _id: new ObjectId(id) });
             return item;
@@ -70,7 +66,7 @@ class TimerModel {
     }
 
     async update(id, data) {
-        await this.initialize();
+        await this.ensureInitialized();
         try {
             const result = await this.collection.updateOne({ _id: new ObjectId(id) }, { $set: data });
             return result;
@@ -81,7 +77,7 @@ class TimerModel {
     }
 
     async delete(id) {
-        await this.initialize();
+        await this.ensureInitialized();
         try {
             const result = await this.collection.deleteOne({ _id: new ObjectId(id) });
             return result;
@@ -92,4 +88,4 @@ class TimerModel {
     }
 }
 
-export default TimerModel;
+export default BaseModel;

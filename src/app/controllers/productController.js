@@ -1,5 +1,5 @@
 // controllers/itemController.js
-import ProductModel from '../model/product.js';
+import ProductModel from '../model/productModel.js';
 
 const itemModel = new ProductModel(); // Instantiate the model
 

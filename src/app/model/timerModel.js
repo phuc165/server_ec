@@ -8,7 +8,7 @@ class TimerModel extends BaseModel {
     async getTimelines(timerName) {
         await this.ensureInitialized();
         try {
-            const timelines = await this.db.collection('timelines').find({ timerName }).sort({ createdAt: -1 }).toArray();
+            const timelines = await this.db.collection('timelines').find({ title: timerName }).sort({ createdAt: -1 }).toArray();
             return timelines;
         } catch (error) {
             console.error('Error fetching timelines:', error);

@@ -5,7 +5,7 @@ const itemModel = new TimerModel(); // Instantiate the model
 
 export const getTimerByName = async (req, res) => {
     try {
-        const itemName = req.params.name; // Get item ID from request parameters
+        const itemName = req.params.timerName; // Get item ID from request parameters
         const item = await itemModel.getTimelines(itemName);
 
         const timelineData = item.map((timeline) => ({

@@ -78,6 +78,28 @@ export const getProductsBySubCategory = async (req, res) => {
     }
 };
 
+export const getFlashSaleProduct = async (req, res) => {
+    try {
+        const limit = parseInt(req.query.limit) || 10;
+        const skip = parseInt(req.query.skip) || 0;
+        const select = req.query.select;
+
+        const items = await itemModel.getFlashSaleProduct(limit, skip, select);
+        res.status(200).json({
+            success: true,
+            message: 'getFlashSaleProduct retrieved successfully',
+            data: items,
+        });
+    } catch (error) {
+        console.error('Error in getProducts controller:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve items',
+            error: error.message || 'Internal Server Error',
+        });
+    }
+};
+
 //controller for getting product by best selling
 export const getBestSellerProduct = async (req, res) => {
     try {

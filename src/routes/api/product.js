@@ -4,6 +4,7 @@ import {
     getProducts,
     getProductsBySubCategory,
     getBestSellerProduct,
+    getFlashSaleProduct,
     getAllItems,
     getItemById,
     updateItem,
@@ -16,6 +17,7 @@ router.post('/', createItem);
 // router.get('/', getAllItems);
 router.get('/', getProducts);
 router.get('/bestSeller', getBestSellerProduct);
+router.get('/flashSale', getFlashSaleProduct);
 router.get('/:categoryName', getProductsBySubCategory);
 router.get('/:id', getItemById);
 router.put('/:id', updateItem);

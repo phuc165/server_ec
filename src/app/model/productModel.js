@@ -40,6 +40,24 @@ class ProductModel extends BaseModel {
         }
     }
 
+    async getFlashSaleProduct(limit, skip, select) {
+        await this.ensureInitialized();
+        const query = { flashSale: true };
+        try {
+            let projection = {};
+            if (select) {
+                const fields = select.split(',');
+                fields.forEach((field) => {
+                    projection[field.trim()] = 1;
+                });
+            }
+            return await this.collection.find(query, { projection }).skip(skip).limit(limit).toArray();
+        } catch (err) {
+            console.error('Error in getFlashSaleProduct model:', err);
+            throw err;
+        }
+    }
+
     async getBestSellerProduct(limit = 10, skip = 0, select = null, filter = {}) {
         await this.ensureInitialized();
         try {
@@ -51,7 +69,7 @@ class ProductModel extends BaseModel {
                 });
             }
 
-            return await this.collection.find(filter).project(projection).skip(skip).limit(limit).sort({ sales: -1 }).toArray();
+            return await this.collection.find(filter).project(projection).skip(skip).limit(limit).sort({ sale: -1 }).toArray();
         } catch (err) {
             console.error(`Error in getBestSellerProduct model:`, err);
             throw err;

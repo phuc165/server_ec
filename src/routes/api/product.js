@@ -9,18 +9,18 @@ import {
     getItemById,
     updateItem,
     deleteItem,
+    getRelatedProducts,
 } from '../../app/controllers/productController.js';
 
 const router = express.Router();
 
 router.post('/', createItem);
-// router.get('/', getAllItems);
 router.get('/', getProducts);
 router.get('/bestSeller', getBestSellerProduct);
 router.get('/flashSale', getFlashSaleProduct);
-router.get('/:categoryName', getProductsBySubCategory);
-router.get('/:id', getItemById);
-router.put('/:id', updateItem);
-router.delete('/:id', deleteItem);
-
+router.get('/:id([0-9a-fA-F]{24})', getItemById);
+router.get('/related/:id', getRelatedProducts);
+router.get('/subcategory/:categoryName', getProductsBySubCategory);
+router.put('/:id([0-9a-fA-F]{24})', updateItem);
+router.delete('/:id([0-9a-fA-F]{24})', deleteItem);
 export default router;

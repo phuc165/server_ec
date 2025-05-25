@@ -3,23 +3,26 @@ import 'dotenv/config';
 import connect from './connections/db.js';
 import router from './routes/index.js';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
+
 const app = express();
 const PORT = process.env.PORT;
 
-//HTTP request logger
 app.use(morgan('combined'));
-
-//middleware
+app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
-//connect to db
 connect();
 
-app.use(cors());
-
+const corsOptions = {
+    origin: 'http://localhost:5173',
+    credentials: true,
+};
+app.use(cors(corsOptions));
 app.use(router);
+
 app.listen(PORT, () => {
     console.log(`Example app listening on port ${PORT}`);
 });

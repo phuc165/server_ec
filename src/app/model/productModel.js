@@ -1,4 +1,5 @@
 import BaseModel from './baseModel.js';
+import { ObjectId } from 'mongodb';
 
 class ProductModel extends BaseModel {
     constructor() {
@@ -22,9 +23,12 @@ class ProductModel extends BaseModel {
         }
     }
 
-    async getProductsBySubCategory(limit, skip, select, categoryName) {
+    async getProductsBySubCategory(limit, skip, select, categoryName, excludeId) {
         await this.ensureInitialized();
-        const query = { sub_category: categoryName };
+        let query = { sub_category: categoryName };
+        if (excludeId) {
+            query._id = { $ne: new ObjectId(excludeId) }; // Use ObjectId here
+        }
         try {
             let projection = {};
             if (select) {

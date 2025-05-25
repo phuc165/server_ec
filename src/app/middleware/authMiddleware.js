@@ -1,21 +1,25 @@
 import jwt from 'jsonwebtoken';
 import asyncHandler from 'express-async-handler';
-import User from '../model/userModel.js';
+import UserModel from '../model/userModel.js';
+
+// Create an instance of UserModel
+const userModel = new UserModel();
 
 const protect = asyncHandler(async (req, res, next) => {
     let token;
-
     token = req.cookies.jwt;
 
     if (token) {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET);
-            const user = await User.findById(decoded.userId);
+            const user = await userModel.findById(decoded.userId);
             if (!user) {
                 throw new Error('User not found');
             }
-            delete user.password; // Remove password from user object
-            req.user = user;
+            // Create a new object without the password
+            const userWithoutPassword = { ...user };
+            delete userWithoutPassword.password; // Remove password from user object
+            req.user = userWithoutPassword;
             next();
         } catch (error) {
             console.error(error);

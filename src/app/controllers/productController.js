@@ -41,7 +41,7 @@ export const getProducts = async (req, res) => {
         const items = await itemModel.getProducts(limit, skip, select);
         res.status(200).json({
             success: true,
-            message: 'Items retrieved successfully',
+            message: 'Items retrieved successfully get 10 items',
             data: items,
         });
     } catch (error) {
@@ -147,7 +147,7 @@ export const getItemById = async (req, res) => {
     try {
         const itemId = req.params.id; // Get item ID from request parameters
         const item = await itemModel.getById(itemId);
-
+        console.log('getItemById called with id:', req.params.id);
         if (!item) {
             // If item not found, return 404 Not Found
             return res.status(404).json({
@@ -158,7 +158,7 @@ export const getItemById = async (req, res) => {
 
         res.status(200).json({
             success: true,
-            message: 'Item retrieved successfully',
+            message: 'Item retrieved successfully get by id',
             data: item,
         });
     } catch (error) {
@@ -233,6 +233,48 @@ export const deleteItem = async (req, res) => {
         res.status(500).json({
             success: false,
             message: 'Failed to delete item',
+            error: error.message || 'Internal Server Error',
+        });
+    }
+};
+
+// get related products based on subcategory
+export const getRelatedProducts = async (req, res) => {
+    try {
+        const productId = req.params.id;
+        const limit = parseInt(req.query.limit) || 5;
+        const skip = parseInt(req.query.skip) || 0;
+        const select = req.query.select;
+
+        // Fetch the current product to get its subcategory
+        const product = await itemModel.getById(productId);
+        if (!product) {
+            return res.status(404).json({
+                success: false,
+                message: 'Product not found',
+            });
+        }
+        const subcategory = product.sub_category;
+
+        // Fetch related products, excluding the current product
+        const relatedProducts = await itemModel.getProductsBySubCategory(
+            limit,
+            skip,
+            select,
+            subcategory,
+            productId, // Pass productId to exclude it
+        );
+
+        res.status(200).json({
+            success: true,
+            message: 'Related products retrieved successfully',
+            data: relatedProducts,
+        });
+    } catch (error) {
+        console.error('Error in getRelatedProducts controller:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Failed to retrieve related products',
             error: error.message || 'Internal Server Error',
         });
     }

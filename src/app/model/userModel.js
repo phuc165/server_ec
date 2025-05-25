@@ -4,7 +4,11 @@ import { ObjectId } from 'mongodb';
 
 class UserModel extends BaseModel {
     constructor() {
+        if (UserModel.instance) {
+            return UserModel.instance;
+        }
         super('users');
+        UserModel.instance = this;
     }
 
     async findOne(query) {
@@ -39,6 +43,7 @@ class UserModel extends BaseModel {
                 name: userData.name,
                 email: userData.email,
                 password: hashedPassword,
+                addresses: [], // Initialize addresses array
                 createdAt: new Date(),
                 updatedAt: new Date(),
             };
@@ -82,6 +87,30 @@ class UserModel extends BaseModel {
             console.error('Error matching password:', error);
             throw error;
         }
+    }
+
+    //address
+    async addAddress(userId, addressData) {
+        const addressId = new ObjectId();
+        const address = { _id: addressId, ...addressData };
+        const result = await this.collection.updateOne({ _id: new ObjectId(userId) }, { $push: { addresses: address } });
+        if (result.matchedCount === 0) throw new Error('User not found');
+        return address;
+    }
+
+    async updateAddress(userId, addressId, addressData) {
+        const address = { _id: new ObjectId(addressId), ...addressData };
+        const result = await this.collection.updateOne(
+            { _id: new ObjectId(userId), 'addresses._id': new ObjectId(addressId) },
+            { $set: { 'addresses.$': address } },
+        );
+        if (result.matchedCount === 0) throw new Error('Address not found');
+        return address;
+    }
+
+    async deleteAddress(userId, addressId) {
+        const result = await this.collection.updateOne({ _id: new ObjectId(userId) }, { $pull: { addresses: { _id: new ObjectId(addressId) } } });
+        if (result.matchedCount === 0) throw new Error('Address not found');
     }
 }
 

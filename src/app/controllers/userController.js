@@ -4,9 +4,6 @@ import generateToken from '../utils/generateToken.js';
 
 const userModel = new UserModel();
 
-// @desc    Auth user & get token
-// @route   POST /api/users/auth
-// @access  Public
 const authUser = asyncHandler(async (req, res) => {
     const { email, password } = req.body;
 
@@ -26,9 +23,6 @@ const authUser = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Register a new user
-// @route   POST /api/users
-// @access  Public
 const registerUser = asyncHandler(async (req, res) => {
     const { name, email, password } = req.body;
 
@@ -117,4 +111,42 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         throw new Error('User not found');
     }
 });
-export { authUser, registerUser, logoutUser, getUserProfile, updateUserProfile };
+//address
+const getUserAddresses = asyncHandler(async (req, res) => {
+    const user = await userModel.findById(req.user._id);
+    if (user) {
+        res.json(user.addresses || []);
+    } else {
+        res.status(404);
+        throw new Error('User not found');
+    }
+});
+
+const addUserAddress = asyncHandler(async (req, res) => {
+    const addressData = req.body;
+    const newAddress = await userModel.addAddress(req.user._id, addressData);
+    res.status(201).json(newAddress);
+});
+
+const updateUserAddress = asyncHandler(async (req, res) => {
+    const addressData = req.body;
+    const updatedAddress = await userModel.updateAddress(req.user._id, req.params.addressId, addressData);
+    res.json(updatedAddress);
+});
+
+const deleteUserAddress = asyncHandler(async (req, res) => {
+    await userModel.deleteAddress(req.user._id, req.params.addressId);
+    res.json({ message: 'Address deleted' });
+});
+
+export {
+    authUser,
+    registerUser,
+    logoutUser,
+    getUserProfile,
+    updateUserProfile,
+    getUserAddresses,
+    addUserAddress,
+    updateUserAddress,
+    deleteUserAddress,
+};

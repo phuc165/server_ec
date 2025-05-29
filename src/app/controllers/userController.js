@@ -53,9 +53,6 @@ const registerUser = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Logout user / clear cookie
-// @route   POST /api/users/logout
-// @access  Public
 const logoutUser = (req, res) => {
     res.cookie('jwt', '', {
         httpOnly: true,
@@ -64,9 +61,6 @@ const logoutUser = (req, res) => {
     res.status(200).json({ message: 'Logged out successfully' });
 };
 
-// @desc    Get user profile
-// @route   GET /api/users/profile
-// @access  Private
 const getUserProfile = asyncHandler(async (req, res) => {
     const user = await userModel.findById(req.user._id);
 
@@ -82,9 +76,6 @@ const getUserProfile = asyncHandler(async (req, res) => {
     }
 });
 
-// @desc    Update user profile
-// @route   PUT /api/users/profile
-// @access  Private
 const updateUserProfile = asyncHandler(async (req, res) => {
     const user = await userModel.findById(req.user._id);
 
@@ -98,7 +89,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
             updateData.password = req.body.password;
         }
 
-        const result = await userModel.updateUser(user._id, updateData);
+        await userModel.updateUser(user._id, updateData);
         const updatedUser = await userModel.findById(user._id);
 
         res.json({
@@ -111,7 +102,7 @@ const updateUserProfile = asyncHandler(async (req, res) => {
         throw new Error('User not found');
     }
 });
-//address
+
 const getUserAddresses = asyncHandler(async (req, res) => {
     const user = await userModel.findById(req.user._id);
     if (user) {
@@ -139,6 +130,49 @@ const deleteUserAddress = asyncHandler(async (req, res) => {
     res.json({ message: 'Address deleted' });
 });
 
+// Cart controller functions
+const getUserCart = asyncHandler(async (req, res) => {
+    const cart = await userModel.getCart(req.user._id);
+    res.json(cart);
+});
+
+const addToCart = asyncHandler(async (req, res) => {
+    const { productId, quantity, attributes, productData } = req.body;
+    if (!productId || !quantity || quantity < 1) {
+        res.status(400);
+        throw new Error('Invalid cart item data');
+    }
+    // Ensure productData is included, defaulting to an empty object if not provided
+    const cartItem = { productId, quantity, attributes: attributes || {}, productData: productData || {} };
+    const updatedCart = await userModel.addToCart(req.user._id, cartItem);
+    res.status(201).json(updatedCart);
+});
+
+const updateCartItemQuantity = asyncHandler(async (req, res) => {
+    const { productId, attributes, quantity } = req.body;
+    if (!productId || !quantity || quantity < 1) {
+        res.status(400);
+        throw new Error('Invalid quantity');
+    }
+    const updatedCart = await userModel.updateCartItemQuantity(req.user._id, productId, attributes || {}, quantity);
+    res.json(updatedCart);
+});
+
+const removeFromCart = asyncHandler(async (req, res) => {
+    const { productId, attributes } = req.body;
+    if (!productId) {
+        res.status(400);
+        throw new Error('Product ID is required');
+    }
+    const updatedCart = await userModel.removeFromCart(req.user._id, productId, attributes || {});
+    res.json(updatedCart);
+});
+
+const clearCart = asyncHandler(async (req, res) => {
+    const clearedCart = await userModel.clearCart(req.user._id);
+    res.json(clearedCart);
+});
+
 export {
     authUser,
     registerUser,
@@ -149,4 +183,9 @@ export {
     addUserAddress,
     updateUserAddress,
     deleteUserAddress,
+    getUserCart,
+    addToCart,
+    updateCartItemQuantity,
+    removeFromCart,
+    clearCart,
 };

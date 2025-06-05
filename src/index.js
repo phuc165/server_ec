@@ -20,7 +20,7 @@ app.use(express.json());
 connect();
 
 const corsOptions = {
-    origin: 'http://localhost:5173',
+    origin: 'https://ecommerce-client-f9vo.onrender.com',
     credentials: true,
 };
 app.use(cors(corsOptions));

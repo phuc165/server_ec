@@ -6,6 +6,9 @@ import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import morgan from 'morgan';
 
+const tls = require('tls');
+tls.DEFAULT_MIN_VERSION = 'TLSv1.2';
+
 const app = express();
 const PORT = process.env.PORT;
 

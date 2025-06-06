@@ -37,4 +37,12 @@ export default {
         region: process.env.AWS_REGION,
         bucketName: process.env.AWS_BUCKET_NAME,
     },
+    // VNPAY Configuration
+    vnpay: {
+        vnp_TmnCode: process.env.VNP_TMN_CODE || '5HZLPWM3',
+        vnp_HashSecret: process.env.VNP_HASH_SECRET || 'F2TT67F52DOZ5BHGEDVFZFO75UVGTLO0',
+        vnp_Url: 'https://sandbox.vnpayment.vn/paymentv2/vpcpay.html',
+        vnp_Api: 'https://sandbox.vnpayment.vn/merchant_webapi/api/transaction',
+        vnp_ReturnUrl: process.env.VNP_RETURN_URL || 'http://localhost:3000/api/v1/payment/vnpay_return',
+    },
 };

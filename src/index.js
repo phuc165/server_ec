@@ -22,6 +22,7 @@ app.use(express.json());
 
 connect();
 
+console.log('CORS Middleware: Allowed Client URL from env:', clientURL);
 const corsOptions = {
     origin: `${clientURL}`,
     credentials: true,
